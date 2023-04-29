@@ -7,6 +7,7 @@ import { dbconfig } from '../dbconfig.js';
  * 
  */
 export const loginAdmin = async (req, res) => {
+    console.log('ok')
     const { admin_id, password } = req.body;
     if (!admin_id || !password) {
         return res.status(400).send({ message: "Missing required fields" });
