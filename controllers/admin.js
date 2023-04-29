@@ -1,4 +1,3 @@
-import express from 'express';
 import oracledb from 'oracledb'
 import { dbconfig } from '../dbconfig.js';
 
@@ -7,7 +6,6 @@ import { dbconfig } from '../dbconfig.js';
  * 
  */
 export const loginAdmin = async (req, res) => {
-    console.log('ok')
     const { admin_id, password } = req.body;
     if (!admin_id || !password) {
         return res.status(400).send({ message: "Missing required fields" });
@@ -37,7 +35,7 @@ export const loginAdmin = async (req, res) => {
 export const createAdmin = async (req, res) => {
     try {
         const { admin_id, first_name, last_name, email, phone_number, password } = req.body;
-        if (!admin_id || !password || !first_name || !last_name || !phone_number || email) {
+        if (!admin_id || !password || !first_name || !last_name || !phone_number || !email) {
             return res.status(400).send({ message: "Missing required fields" });
         }
         const sql = `INSERT INTO Administrator (admin_id, password, first_name, last_name, email, phone_number) 
@@ -60,6 +58,3 @@ export const createAdmin = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
-
-
-
