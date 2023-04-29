@@ -3,18 +3,22 @@ import express from 'express';
 import bodyParser from 'body-parser';
 
 import adminRoutes from './routes/admin.js';
+import ownerRoutes from './routes/owner.js';
+import studentRoutes from './routes/student.js';
 
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:3000', // remplacer par votre domaine
+  origin: 'http://localhost:3000',
   methods: 'GET,PUT,POST,DELETE',
-  credentials: true // permet l'envoi de cookies
+  credentials: true
 }))
 app.use(bodyParser.json({ limit: '30mb', extended: true }))
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }))
 
 app.use('/admin', adminRoutes);
+app.use('/owner', ownerRoutes);
+app.use('/student', studentRoutes);
 
 const PORT = process.env.PORT|| 5000;
 
