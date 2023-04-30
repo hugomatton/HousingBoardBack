@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import adminRoutes from './routes/admin.js';
 import ownerRoutes from './routes/owner.js';
 import studentRoutes from './routes/student.js';
+import housingRoutes from './routes/housing.js';
 
 const app = express();
 
@@ -16,9 +17,13 @@ app.use(cors({
 app.use(bodyParser.json({ limit: '30mb', extended: true }))
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }))
 
+//USER ROUTES
 app.use('/admin', adminRoutes);
 app.use('/owner', ownerRoutes);
 app.use('/student', studentRoutes);
+
+//HOUSING DATA ROUTES
+app.use('/housing', housingRoutes)
 
 const PORT = process.env.PORT|| 5000;
 
