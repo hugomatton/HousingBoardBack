@@ -6,6 +6,7 @@ import adminRoutes from './routes/admin.js';
 import ownerRoutes from './routes/owner.js';
 import studentRoutes from './routes/student.js';
 import housingRoutes from './routes/housing.js';
+import housingTypesRoutes from './routes/housing_types.js';
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use('/student', studentRoutes);
 
 //HOUSING DATA ROUTES
 app.use('/housing', housingRoutes)
+app.use('/housingtypes', housingTypesRoutes)
 
 const PORT = process.env.PORT|| 5000;
 
