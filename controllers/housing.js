@@ -4,16 +4,47 @@ import { dbconfig } from '../dbconfig.js';
 /**
  * GET ALL HOUSINGS
  */
-export const getHousings = async (req, res) => {
-  const sql = `SELECT * FROM Housing`
+export const getAllHousings = async (req, res) => {
+  const sqlHousing = `SELECT * FROM Housing`
+  const sqlPicture = `SELECT * FROM Picture WHERE housing_id = :housing_id`
   try {
     const connection = await oracledb.getConnection(dbconfig)
-    const result = await connection.execute(sql)
-    res.send(result)
+    //housing
+    const resultHousing = await connection.execute(sqlHousing)
+    //format result
+    const data = []
+    for(let i = 0;i < resultHousing.rows.length; i++){
+      let h = resultHousing.rows[i]
+      let formatHousing = {
+        housing_id : h[0],
+        housing_address : h[1],
+        bedrooms_nb : h[2],
+        bathrooms_nb : h[3],
+        area : h[4],
+        monthly_rent : h[5],
+        lease_duration : h[6],
+        furnished : h[7],
+        type_name : h[8],
+        owner_id : h[9],
+        pictures : []
+      }
+      //picture
+      const resultPicture = await connection.execute(sqlPicture, {housing_id: formatHousing.housing_id})
+      for(let l = 0; l < resultPicture.rows.length; l++){
+        let p = resultPicture.rows[l]
+        if(formatHousing.housing_id === p[1]){
+          formatHousing.pictures.push(p[2])
+        }
+      }
+      data.push(formatHousing)
+    }
+    await connection.close()
+    res.status(200).send(data)
   } catch (error) {
     return res.status(500).send({ message: "Server error" });
   }
 }
+
 
 /**
  * GET HOUSINGS BY OWNER ID
@@ -36,7 +67,7 @@ export const getHousingByOwnerId = async (req, res) => {
         housing_address : h[1],
         bedrooms_nb : h[2],
         bathrooms_nb : h[3],
-        are : h[4],
+        area : h[4],
         monthly_rent : h[5],
         lease_duration : h[6],
         furnished : h[7],
