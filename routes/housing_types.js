@@ -5,7 +5,7 @@ import {getTypes, createHousingType, deleteHousingType} from '../controllers/hou
 const router = express.Router();
 
 router.get('/', getTypes)
-router.get('/', createHousingType)
+router.post('/', createHousingType)
 router.delete('/:type_name', deleteHousingType)
 
 export default router;
