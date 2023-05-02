@@ -8,6 +8,6 @@ router.get('/', getAllHousings)
 router.get('/:id', getHousingByOwnerId)
 router.post('/', createHousing)
 router.delete('/:id', deleteHousingById)
-router.patch('/:id', updateHousing)
+router.put('/', updateHousing)
 
 export default router;

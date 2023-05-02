@@ -140,8 +140,9 @@ export const createHousing = async (req, res) => {
  * UPDATE ONE HOUSING
  */
 export const updateHousing = async (req, res) => {
-  const housingId = req.params.id; // récupérer l'ID du logement à mettre à jour depuis la requête
-  const { housing_address,
+  const { 
+    housing_id,
+    housing_address,
     bedrooms_nb,
     bathrooms_nb,
     area,
@@ -150,36 +151,62 @@ export const updateHousing = async (req, res) => {
     furnished,
     type_name,
     owner_id,
-    picture_id } = req.body;
-  const sql = `UPDATE housing 
-                 SET housing_address = :housing_address,
-                     bedrooms_nb = :bedrooms_nb,
-                     bathrooms_nb = :bathrooms_nb,
-                     area = :area,
-                     monthly_rent = :monthly_rent,
-                     lease_duration = :lease_duration,
-                     furnished = :furnished,
-                     type_name = :type_name,
-                     owner_id = :owner_id,
-                     picture_id = :picture_id
-                 WHERE id = :id`; // requête SQL pour mettre à jour l'entrée dans la table "housing"
-  const bindParams = { housing_address, bedrooms_nb, bathrooms_nb, area, monthly_rent, lease_duration, furnished, type_name, owner_id, picture_id, id: housingId };
+    pictures
+  } = req.body;
+
+  const sqlUpdateHousing = `UPDATE housing 
+                            SET 
+                              housing_address = :housing_address,
+                              bedrooms_nb = :bedrooms_nb,
+                              bathrooms_nb = :bathrooms_nb,
+                              area = :area,
+                              monthly_rent = :monthly_rent,
+                              lease_duration = :lease_duration,
+                              furnished = :furnished,
+                              type_name = :type_name,
+                              owner_id = :owner_id
+                            WHERE 
+                              housing_id = :housing_id`;
+  
+  const sqlDeletePictures = `DELETE FROM picture WHERE housing_id = :housing_id`;
+  
+  const sqlInsertPictures = `INSERT INTO picture (picture_id, picture_url, housing_id) 
+                              VALUES (picture_seq.NEXTVAL, :picture_url, :housing_id)`;
+
+  const bindParamsUpdateHousing = { 
+    housing_address, 
+    bedrooms_nb, 
+    bathrooms_nb, 
+    area, 
+    monthly_rent, 
+    lease_duration, 
+    furnished, 
+    type_name, 
+    owner_id, 
+    housing_id 
+  };
+  
   try {
     const connection = await oracledb.getConnection(dbconfig);
-    const result = await connection.execute(sql, bindParams);
-    await connection.commit()
+    await connection.execute(sqlUpdateHousing, bindParamsUpdateHousing);
+
+    // Supprime les anciennes images du logement
+    await connection.execute(sqlDeletePictures, { housing_id });
+
+    // Ajoute les nouvelles images du logement
+    for(let p of pictures) {
+      await connection.execute(sqlInsertPictures, { picture_url: p, housing_id });
+    }
+
+    await connection.commit();
     await connection.close();
-    if (result.rowsAffected && result.rowsAffected > 0) {
-      res.status(200).send({ message: `Housing with id ${housingId} updated successfully.` });
-    }
-    else {
-      res.status(404).send({ error: `Housing with id ${housingId} not found.` });
-    }
+    res.status(200).send({ message: 'Housing updated successfully.' });
   } catch (err) {
     console.error(err.message);
     res.status(500).send({ error: 'Error updating housing.' });
   }
 }
+
 
 
 /**
