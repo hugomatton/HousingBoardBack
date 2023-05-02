@@ -185,21 +185,24 @@ export const updateHousing = async (req, res) => {
 /**
  * DELETE ONE HOUSING BY ID
  */
-export const deleteHousing = async (req, res) => {
-  const housingId = req.params.id; // récupérer l'ID du logement à supprimer depuis la requête
-  const sql = `DELETE FROM housing WHERE id = :id`; // requête SQL pour supprimer l'entrée dans la table "housing"
+export const deleteHousingById = async (req, res) => {
+  const housingId = req.params.id;
+  const deleteHousingSql = `DELETE FROM Housing WHERE housing_id = :id`;
+  const deletePicturesSql = `DELETE FROM Picture WHERE housing_id = :id`;
   try {
     const connection = await oracledb.getConnection(dbconfig);
-    const result = await connection.execute(sql, [housingId]);
-    await connection.commit()
+    const deletePicturesResult = await connection.execute(deletePicturesSql, {id: housingId});
+    const deleteResult = await connection.execute(deleteHousingSql, {id: housingId});
+    await connection.commit(); // Commit changes to the database
     await connection.close();
-    if (result.rowsAffected && result.rowsAffected > 0) {
-      res.status(200).send({ message: `Housing with id ${housingId} deleted successfully.` });
-    } else {
-      res.status(404).send({ error: `Housing with id ${housingId} not found.` });
+    if(deleteResult.rowsAffected === 0) {
+      return res.status(404).send({ message: "Housing not found" });
     }
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send({ error: 'Error deleting housing.' });
+    res.status(200).send({ message: "Housing and associated pictures deleted successfully" });
+  } catch (error) {
+    if(error.errorNum === 2292) { // Check for integrity constraint violation
+      return res.status(400).send({ message: "Cannot delete housing with associated pictures" });
+    }
+    return res.status(500).send({ message: "Server error" });
   }
 }
