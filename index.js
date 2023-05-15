@@ -1,12 +1,14 @@
 import cors from 'cors'
 import express from 'express';
 import bodyParser from 'body-parser';
+import cron from 'node-cron';
 
 import adminRoutes from './routes/admin.js';
 import ownerRoutes from './routes/owner.js';
 import studentRoutes from './routes/student.js';
 import housingRoutes from './routes/housing.js';
 import housingTypesRoutes from './routes/housing_types.js';
+import messageRoutes from './routes/message.js'
 
 const app = express();
 
@@ -26,6 +28,12 @@ app.use('/student', studentRoutes);
 //HOUSING DATA ROUTES
 app.use('/housing', housingRoutes)
 app.use('/housingtypes', housingTypesRoutes)
+app.use('/message', messageRoutes)
+
+cron.schedule('*/1 * * * *', () => {
+  //gérer les étudiant
+  console.log('hugo')
+});
 
 const PORT = process.env.PORT|| 5000;
 
