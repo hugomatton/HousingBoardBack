@@ -32,7 +32,6 @@ app.use('/message', messageRoutes)
 
 cron.schedule('*/1 * * * *', () => {
   //gérer les étudiant
-  console.log('hugo')
 });
 
 const PORT = process.env.PORT|| 5000;

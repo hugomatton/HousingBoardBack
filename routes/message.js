@@ -1,11 +1,12 @@
 import express from 'express';
 
-import {getStudentOwnerConversation, ownerSendMessageToStudent, studentSendMessageToOwner} from '../controllers/message.js';
+import {getStudentOwnerConversation, ownerSendMessageToStudent, studentSendMessageToOwner, loadStudentConversation} from '../controllers/message.js';
 
 const router = express.Router();
 
 router.post('/studentToOwner', studentSendMessageToOwner)
 router.post('/ownerToStudent', ownerSendMessageToStudent)
-router.get('/',getStudentOwnerConversation)
+router.get('/conversation',getStudentOwnerConversation)
+router.get('/allConversationStudent', loadStudentConversation)
 
 export default router;
