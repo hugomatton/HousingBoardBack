@@ -99,6 +99,29 @@ export const loadStudentConversation = async (req, res) => {
     }
 };
 
+export const loadOwnerConversation = async (req, res) => {
+    try {
+        const { owner_id } = req.query;
+        const connection = await oracledb.getConnection(dbconfig);
+        const result = await connection.execute(
+            `SELECT DISTINCT student.STUDENT_ID, student.FIRST_NAME, owner.OWNER_ID
+            FROM MESSAGE
+            INNER JOIN STUDENT ON MESSAGE.STUDENT_SEND_ID = STUDENT.STUDENT_ID
+            INNER JOIN OWNER ON MESSAGE.OWNER_RECEIVE_ID = OWNER.OWNER_ID
+            WHERE OWNER.OWNER_ID = :ownerId`,
+            [owner_id]
+        );
+        await connection.close();
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred');
+    }
+};
+
+
+
+
 
 
 
